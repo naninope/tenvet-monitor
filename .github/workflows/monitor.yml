@@ -21,7 +21,7 @@ jobs:
       DATE_TO: "2026-10-27"
       DAYS_FROM: ""             # ...albo przesuwny (np. 9 i 14) – wtedy DATE_FROM/DATE_TO zostaw puste
       DAYS_TO: ""
-      MIN_HOUR: "16"            # od 17:00
+      MIN_HOUR: "17"            # od 17:00
       MAX_HOUR: ""              # bez górnej granicy
       # ========================================
       NTFY_TOPIC: ${{ secrets.NTFY_TOPIC }}
