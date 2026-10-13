@@ -45,7 +45,7 @@ jobs:
       - name: Sprawdzenie terminów
         run: |
           mkdir -p state
-          python check.py
+          python .github/workflows/check.py
 
       - name: Zapamiętanie terminów
         if: always()
