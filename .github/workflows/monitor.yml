@@ -1,1 +1,55 @@
+name: Monitor terminow TENVET
 
+on:
+  schedule:
+    - cron: "*/10 * * * *"   # co 10 minut (GitHub czasem opóźnia uruchomienia)
+  workflow_dispatch:          # przycisk "Run workflow" do ręcznego uruchomienia
+
+concurrency:
+  group: monitor
+  cancel-in-progress: false
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    env:
+      # ===== USTAWIENIA – zmieniaj tutaj =====
+      CLINIC_URL: "https://tenvet-krakow.rezerwacja.vetineo.com/"
+      DOCTOR: "Jankowska"
+      DATE_FROM: "2026-10-22"   # stały zakres dat...
+      DATE_TO: "2026-10-27"
+      DAYS_FROM: ""             # ...albo przesuwny (np. 9 i 14) – wtedy DATE_FROM/DATE_TO zostaw puste
+      DAYS_TO: ""
+      MIN_HOUR: "17"            # od 17:00
+      MAX_HOUR: ""              # bez górnej granicy
+      # ========================================
+      NTFY_TOPIC: ${{ secrets.NTFY_TOPIC }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Instalacja
+        run: pip install playwright==1.47.0
+
+      - name: Odczyt zapamiętanych terminów
+        uses: actions/cache/restore@v4
+        with:
+          path: state
+          key: seen-${{ github.run_id }}
+          restore-keys: seen-
+
+      - name: Sprawdzenie terminów
+        run: |
+          mkdir -p state
+          python check.py
+
+      - name: Zapamiętanie terminów
+        if: always()
+        uses: actions/cache/save@v4
+        with:
+          path: state
+          key: seen-${{ github.run_id }}
