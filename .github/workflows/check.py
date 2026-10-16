@@ -11,11 +11,12 @@ Ustawienia (zmienne środowiskowe, ustawiane w .github/workflows/monitor.yml):
 import json
 import os
 import sys
+import time
 import urllib.request
 from datetime import datetime, timedelta
 from zoneinfo import ZoneInfo
 
-from playwright.sync_api import sync_playwright
+from playwright.sync_api import sync_playwright, TimeoutError as PWTimeout
 
 CLINIC_URL = os.environ.get("CLINIC_URL", "https://tenvet-krakow.rezerwacja.vetineo.com/")
 DOCTOR = os.environ.get("DOCTOR", "Jankowska")
@@ -70,6 +71,17 @@ def read_slots():
         raise SystemExit((data or {}).get("error", "Nie udało się odczytać danych ze strony"))
     return data
 
+def read_slots_retry(attempts=3):
+  for attempt in range(1, attempts + 1):
+    try:
+      return read_slots()
+    except PWTimeout as e:
+      print(f"Proba {attempt}/{attempts} nieudana (timeout): {str(e).splitlines()[0]}")
+      if attempt < attempts:
+        time.sleep(20)
+  print("::warning::Strona rezerwacji nie odpowiada - pomijam to sprawdzenie, kolejny przebieg sprobuje ponownie")
+  sys.exit(0)
+
 
 def notify(title, message, priority="urgent"):
     req = urllib.request.Request(
@@ -87,7 +99,7 @@ def notify(title, message, priority="urgent"):
 
 
 def main():
-    data = read_slots()
+    data = read_slots_retry()
     hits = sorted(
         s for s in data["free"]
         if date_from <= s[:10] <= date_to and MIN_HOUR <= int(s[11:13]) < MAX_HOUR
