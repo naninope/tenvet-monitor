@@ -20,8 +20,17 @@ from playwright.sync_api import sync_playwright, TimeoutError as PWTimeout
 
 CLINIC_URL = os.environ.get("CLINIC_URL", "https://tenvet-krakow.rezerwacja.vetineo.com/")
 DOCTOR = os.environ.get("DOCTOR", "Jankowska")
-MIN_HOUR = int(os.environ.get("MIN_HOUR") or 0)
-MAX_HOUR = int(os.environ.get("MAX_HOUR") or 24)
+def parse_time(value, default):
+    """Przyjmuje "17" albo "16:30" i zwraca "HH:MM"."""
+    value = (value or "").strip()
+    if not value:
+        return default
+    h, _, m = value.partition(":")
+    return f"{int(h):02d}:{int(m or 0):02d}"
+
+
+MIN_TIME = parse_time(os.environ.get("MIN_HOUR"), "00:00")
+MAX_TIME = parse_time(os.environ.get("MAX_HOUR"), "24:00")
 TOPIC = os.environ["NTFY_TOPIC"].strip()
 STATE_FILE = "state/seen.json"
 
@@ -102,9 +111,9 @@ def main():
     data = read_slots_retry()
     hits = sorted(
         s for s in data["free"]
-        if date_from <= s[:10] <= date_to and MIN_HOUR <= int(s[11:13]) < MAX_HOUR
+        if date_from <= s[:10] <= date_to and MIN_TIME <= s[11:16] < MAX_TIME
     )
-    print(f"{data['name']} | {date_from} – {date_to} | {MIN_HOUR}:00–{MAX_HOUR}:00")
+    print(f"{data['name']} | {date_from} – {date_to} | {MIN_TIME}–{MAX_TIME}")
     print("Pasujące terminy:", ", ".join(hits) or "brak")
 
     os.makedirs("state", exist_ok=True)
