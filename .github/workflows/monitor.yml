@@ -4,6 +4,11 @@ on:
   schedule:
     - cron: "*/10 * * * *"   # co 10 minut (GitHub czasem opóźnia uruchomienia)
   workflow_dispatch:          # przycisk "Run workflow" do ręcznego uruchomienia
+    inputs:
+      test:
+        description: "Wyślij tylko testowe powiadomienie"
+        type: boolean
+        default: false
 
 concurrency:
   group: monitor
@@ -25,6 +30,7 @@ jobs:
       MAX_HOUR: ""              # bez górnej granicy
       # ========================================
       NTFY_TOPIC: ${{ secrets.NTFY_TOPIC }}
+      TEST_NTFY: ${{ inputs.test }}
     steps:
       - uses: actions/checkout@v4
 
