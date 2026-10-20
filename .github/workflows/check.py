@@ -108,6 +108,10 @@ def notify(title, message, priority="urgent"):
 
 
 def main():
+    if os.environ.get("TEST_NTFY") == "true":
+        notify("Test TENVET", "Testowe powiadomienie - jesli to widzisz, alert dziala.", priority="default")
+        print("Wyslano testowe powiadomienie")
+        return
     data = read_slots_retry()
     hits = sorted(
         s for s in data["free"]
