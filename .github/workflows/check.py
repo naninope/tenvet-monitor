@@ -28,7 +28,7 @@ def parse_time(value, default):
     h, _, m = value.partition(":")
     return f"{int(h):02d}:{int(m or 0):02d}"
 
-
+FULL_DAYS = os.environ.get("FULL_DAYS", "").split()  # dni RRRR-MM-DD, w ktore pasuje kazda godzina
 MIN_TIME = parse_time(os.environ.get("MIN_HOUR"), "00:00")
 MAX_TIME = parse_time(os.environ.get("MAX_HOUR"), "24:00")
 TOPIC = os.environ["NTFY_TOPIC"].strip()
@@ -115,9 +115,9 @@ def main():
     data = read_slots_retry()
     hits = sorted(
         s for s in data["free"]
-        if date_from <= s[:10] <= date_to and MIN_TIME <= s[11:16] < MAX_TIME
+        if date_from <= s[:10] <= date_to and (s[:10] in FULL_DAYS or MIN_TIME <= s[11:16] < MAX_TIME)
     )
-    print(f"{data['name']} | {date_from} – {date_to} | {MIN_TIME}–{MAX_TIME}")
+    print(f"{data['name']} | {date_from} – {date_to} | {MIN_TIME}–{MAX_TIME} | caly dzien: {' '.join(FULL_DAYS) or '-'}")
     print("Pasujące terminy:", ", ".join(hits) or "brak")
 
     os.makedirs("state", exist_ok=True)
