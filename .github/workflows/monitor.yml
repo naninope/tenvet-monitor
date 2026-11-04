@@ -22,11 +22,11 @@ jobs:
       # ===== USTAWIENIA – zmieniaj tutaj =====
       CLINIC_URL: "https://tenvet-krakow.rezerwacja.vetineo.com/"
       DOCTOR: "Jankowska"
-      DATE_FROM: "2026-10-22"   # stały zakres dat...
-      DATE_TO: "2026-11-17"
+      DATE_FROM: "2026-11-09"   # stały zakres dat...
+      DATE_TO: "2026-11-11"
       DAYS_FROM: ""             # ...albo przesuwny (np. 9 i 14) – wtedy DATE_FROM/DATE_TO zostaw puste
       DAYS_TO: ""
-      MIN_HOUR: "16:30"         # od 16:30
+      MIN_HOUR: "16:00"         # od 16:00
       MAX_HOUR: ""              # bez górnej granicy
       # ========================================
       NTFY_TOPIC: ${{ secrets.NTFY_TOPIC }}
