@@ -28,6 +28,7 @@ jobs:
       DAYS_TO: ""
       MIN_HOUR: "16:00"         # od 16:00
       MAX_HOUR: ""              # bez górnej granicy
+      FULL_DAYS: "2026-11-11"    # te dni: kazda godzina (kilka dni oddziel spacja)
       # ========================================
       NTFY_TOPIC: ${{ secrets.NTFY_TOPIC }}
       TEST_NTFY: ${{ inputs.test }}
